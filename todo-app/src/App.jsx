@@ -2,7 +2,10 @@ import { useState, useEffect } from 'react';
 import AddTodoForm from './components/AddTodoForm';
 import TodoFilters from './components/TodoFilters';
 import TodoItem from './components/TodoItem';
+import EditTodoItem from './components/EditTodoItem';
 function App() {
+  //Состояние для редакитрования задачи
+  const [editingId, setEditingId] = useState(null);
   // Состояние для списка задач 
   const [todos, setTodos] = useState(() => {
     // Загружаем сохраненные задачи из localStorage 
@@ -24,6 +27,13 @@ function App() {
     };
     setTodos([...todos, newTodo]);
   };
+  const updateTodo = (id, newText) => {
+    setTodos(todos.map(todo =>
+      todo.id === id ? { ...todo, text: newText } : todo
+    ));
+    setEditingId(null);
+  };
+
   // Переключение статуса задачи 
   const toggleTodo = (id) => {
     setTodos(todos.map(todo =>
@@ -34,6 +44,9 @@ function App() {
   const deleteTodo = (id) => {
     setTodos(todos.filter(todo => todo.id !== id));
   };
+  //.отмена редактироваия
+  const cancelEdit = () => setEditingId(null);
+
   // Фильтрация задач 
   const filteredTodos = todos.filter(todo => {
     if (filter === 'active') return !todo.completed;
@@ -64,18 +77,26 @@ function App() {
       ) : (
         <ul style={{ listStyle: 'none', padding: 0 }}>
           {filteredTodos.map(todo => (
-            <TodoItem
+            editingId === todo.id ? (<EditTodoItem
+              key={todo.id}
+              task={todo}
+              onSave={updateTodo}
+              onCancel={cancelEdit}
+            />
+            ) : (<TodoItem
               key={todo.id}
               task={todo}
               onToggle={toggleTodo}
               onDelete={deleteTodo}
+              onEdit={() => setEditingId(todo.id)}
             />
-          ))}
+            )))}
         </ul>
       )}
       {todos.length > 0 && (
         <button
           onClick={() => setTodos([])}
+          onDoubleClick={() => setTodos([])}
           style={{
             marginTop: '20px',
             padding: '8px 16px',

@@ -1,4 +1,4 @@
-function TodoItem({ task, onToggle, onDelete }) {
+function TodoItem({ task, onToggle, onDelete, onEdit }) {
     return (
         <li style={{
             display: 'flex',
@@ -15,8 +15,11 @@ function TodoItem({ task, onToggle, onDelete }) {
             <span style={{
                 flex: 1,
                 textDecoration: task.completed ? 'line-through' : 'none',
-                color: task.completed ? '#999' : '#333'
-            }}>
+                color: task.completed ? '#999' : '#333',
+                cursor: 'pointer'
+            }}
+            onDoubleClick={() => onEdit(task.id)}
+            >
                 {task.text}
             </span>
             <button
